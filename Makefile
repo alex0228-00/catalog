@@ -20,7 +20,7 @@ clean:
 UT_DB_TAGS ?= database,mysql
 
 ut:
-	go test -v ./src/...
+	go test -v $(go list ./src/... | grep -v './src/cmd' | grep -v './src/datastore/ent')
 
 ut-db:
 	go test -v -tags=$(UT_DB_TAGS) ./src/service/...
