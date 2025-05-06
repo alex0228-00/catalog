@@ -26,7 +26,7 @@ func TestMain(m *testing.M) {
 		Port:     src.GetEnvOrDefault(src.EnvDbPort, "3306"),
 		Username: src.GetEnvOrDefault(src.EnvDbRootUser, "root"),
 		Password: src.GetEnvOrDefault(src.EnvDbRootPassword, "catalog_root_password"),
-		Database: src.GetEnvOrDefault(src.EnvDbSchema, "test_schema"),
+		Database: "",
 	}
 
 	dbClient, err := datastore.Onboarding(
