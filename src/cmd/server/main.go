@@ -22,6 +22,7 @@ func main() {
 
 	host := src.GetEnvOrPanic(src.EnvServerHost)
 	port := src.GetEnvOrPanic(src.EnvServerPort)
+	key := src.GetEnvOrPanic(src.EnvCipherKey)
 
 	dsn := src.Dsn{
 		Host:     src.GetEnvOrPanic(src.EnvDbHost),
@@ -37,7 +38,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	connSvc, err := service.NewConnectionService(nil, dbClient)
+	connSvc, err := service.NewConnectionService([]byte(key), dbClient)
 	if err != nil {
 		logger.Error("Failed to create connection service", zap.Error(err))
 		os.Exit(1)

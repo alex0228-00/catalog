@@ -13,6 +13,8 @@ const (
 	EnvServerHost = "CATALOG_SERVER_HOST"
 	EnvServerPort = "CATALOG_SERVER_PORT"
 
+	EnvCipherKey = "CATALOG_CIPHER_KEY"
+
 	EnvDbHost            = "CATALOG_DB_HOST"
 	EnvDbPort            = "CATALOG_DB_PORT"
 	EnvDbRootUser        = "CATALOG_DB_ROOT_USER"
