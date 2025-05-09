@@ -1,40 +1,14 @@
-package service
+package src
 
 import (
-	"crypto/rand"
 	"fmt"
-	"io"
 	"testing"
 
-	"catalog/src"
-
 	"github.com/pkg/errors"
-	"github.com/stretchr/testify/require"
 	gomock "go.uber.org/mock/gomock"
 )
 
-func TestSecureCredCodec(t *testing.T) {
-	rq := require.New(t)
-
-	mockCred, cleanup := mockCredentials(t, 1)
-	defer cleanup()
-
-	key := make([]byte, 32)
-	_, err := io.ReadFull(rand.Reader, key)
-	rq.NoError(err)
-
-	codec, err := NewSecureCredCodec(src.CipherKey)
-	rq.NoError(err)
-
-	text, err := codec.Encode(mockCred[0])
-	rq.NoError(err)
-
-	decodedCred, err := codec.Decode(text)
-	rq.NoError(err)
-	rq.NotNil(decodedCred)
-}
-
-func mockCredentials(t *testing.T, n int) ([]Credential, func()) {
+func MockCredentials(t *testing.T, n int) ([]Credential, func()) {
 	ctrl := gomock.NewController(t)
 	mockCreds := make(map[CredentialType]credConstructor, n)
 	ret := make([]Credential, 0, n)

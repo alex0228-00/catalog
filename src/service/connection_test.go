@@ -15,7 +15,7 @@ func TestConnectionStore(t *testing.T) {
 	rq := require.New(t)
 	ctx := context.Background()
 
-	mockCred, cleanup := mockCredentials(t, 1)
+	mockCred, cleanup := src.MockCredentials(t, 1)
 	defer cleanup()
 
 	svc, err := NewConnectionService(src.CipherKey, DbClient)

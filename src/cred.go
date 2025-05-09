@@ -1,13 +1,14 @@
-//go:generate mockgen -source=cred.go -destination=mock_cred.go -package=service
+//go:generate mockgen -source=cred.go -destination=mock_cred.go -package=src
 
-package service
+package src
 
 import (
+	"context"
 	"encoding/base64"
-
-	"catalog/src"
+	"net/http"
 
 	"github.com/pkg/errors"
+	"golang.org/x/oauth2"
 )
 
 type CredentialType uint8
@@ -21,15 +22,16 @@ type Credential interface {
 	Type() CredentialType
 	Encode() ([]byte, error)
 	Decode(data []byte) error
+	Auth() *http.Client
 }
 
 type SecureCredCodec struct {
-	cipher *src.Cipher
+	cipher *Cipher
 	creds  map[CredentialType]credConstructor
 }
 
 func NewSecureCredCodec(key []byte) (*SecureCredCodec, error) {
-	cipher, err := src.NewCipher(key)
+	cipher, err := NewCipher(key)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create cipher")
 	}
@@ -42,7 +44,7 @@ func (codec *SecureCredCodec) Encode(cred Credential) (string, error) {
 		return "", errors.Wrap(err, "failed to encode credential")
 	}
 
-	raw := src.EncodeAsTLVBlock(byte(cred.Type()), encoded)
+	raw := EncodeAsTLVBlock(byte(cred.Type()), encoded)
 
 	encrypted, err := codec.cipher.Encrypt(raw)
 	if err != nil {
@@ -62,7 +64,7 @@ func (codec *SecureCredCodec) Decode(text string) (Credential, error) {
 		return nil, errors.Wrap(err, "failed to decrypt credential")
 	}
 
-	_type, rawCred, err := src.DecodeFromTLVBlock(decrypted)
+	_type, rawCred, err := DecodeFromTLVBlock(decrypted)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to decode TLV block")
 	}
@@ -101,4 +103,12 @@ func (t *TokenCredential) Encode() ([]byte, error) {
 	token := make([]byte, len(t.token))
 	copy(token, t.token)
 	return token, nil
+}
+
+func (t *TokenCredential) Auth() *http.Client {
+	token := oauth2.StaticTokenSource(&oauth2.Token{
+		TokenType:   "Bearer",
+		AccessToken: string(t.token),
+	})
+	return oauth2.NewClient(context.Background(), token)
 }

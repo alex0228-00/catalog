@@ -14,23 +14,23 @@ import (
 
 // Map to ent.System
 type Connection struct {
-	ID               string     `json:"id"`
-	Type             string     `json:"type"`
-	Host             string     `json:"host"`
-	UniqueIdentifier string     `json:"unique_identifier"`
-	Credentials      Credential `json:"credentials,omitempty"`
-	CreatedBy        string     `json:"created_by"`
-	UpdatedBy        string     `json:"updated_by"`
+	ID               string         `json:"id"`
+	Type             string         `json:"type"`
+	Host             string         `json:"host"`
+	UniqueIdentifier string         `json:"unique_identifier"`
+	Credentials      src.Credential `json:"credentials,omitempty"`
+	CreatedBy        string         `json:"created_by"`
+	UpdatedBy        string         `json:"updated_by"`
 }
 
 type ConnectionService struct {
 	connStore *datastore.ConnStore
-	credCodec *SecureCredCodec
+	credCodec *src.SecureCredCodec
 	logger    *zap.Logger
 }
 
 func NewConnectionService(key []byte, dbClient *ent.Client) (*ConnectionService, error) {
-	codec, err := NewSecureCredCodec(key)
+	codec, err := src.NewSecureCredCodec(key)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to create secure credential codec")
 	}
