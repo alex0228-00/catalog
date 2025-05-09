@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -89,4 +90,36 @@ type Dsn struct {
 
 func (d Dsn) String() string {
 	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=True", d.Username, d.Password, d.Host, d.Port, d.Database)
+}
+
+// MultipleError 用来收集多个错误
+type MultipleError struct {
+	message string
+	Errors  []error
+}
+
+func NewMultipleError(message string) *MultipleError {
+	return &MultipleError{
+		message: message,
+	}
+}
+
+func (m *MultipleError) Error() string {
+	var msgs []string
+	for _, err := range m.Errors {
+		msgs = append(msgs, err.Error())
+	}
+	return fmt.Sprintf("%s: %s", m.message, strings.Join(msgs, "; "))
+}
+
+// 如果没有错误，就返回 nil
+func (m *MultipleError) ErrOrNil() error {
+	if len(m.Errors) == 0 {
+		return nil
+	}
+	return m
+}
+
+func (m *MultipleError) Add(err error) {
+	m.Errors = append(m.Errors, err)
 }
