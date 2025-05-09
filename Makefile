@@ -20,7 +20,8 @@ clean:
 UT_DB_TAGS ?= database,mysql
 
 ut:
-	go test -v $(go list ./src/... | grep -v './src/cmd' | grep -v './src/datastore/ent')
+	@PKGS=$$(go list ./src/... | grep -v './src/cmd' | grep -v './src/datastore/ent'); \
+	go test -v $$PKGS
 
 ut-db:
 	go test -v -tags=$(UT_DB_TAGS) ./src/service/...
